@@ -6,6 +6,7 @@ import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.graphics.GraphicsLayerScope
 
 interface BlurGlass {
+    val coordinates: Boolean
     fun DrawScope.drawBlurGlass(
         density: Density,
         coordinates: LayoutCoordinates?,

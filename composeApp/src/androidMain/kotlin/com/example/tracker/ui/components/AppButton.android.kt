@@ -1,15 +1,11 @@
 package com.example.tracker.ui.components
 
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.material3.Button
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.GraphicsLayerScope
-import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.layout.LayoutCoordinates
-import androidx.compose.ui.unit.Density
-import com.example.tracker.ui.blurglass.BlurGlass
+import com.example.tracker.ui.glass.LocalPlatformGlassLayer
 
 @Composable
 actual fun AppButton(
@@ -17,27 +13,23 @@ actual fun AppButton(
     modifier: Modifier,
     content: @Composable RowScope.() -> Unit
 ) {
-    BlurButton(
-        onClick = onClick,
-        blurGlass = DefaultBlurGlass,
-        modifier = modifier,
-        content = content
-    )
-}
-
-private object DefaultBlurGlass : BlurGlass {
-    override fun DrawScope.drawBlurGlass(
-        density: Density,
-        coordinates: LayoutCoordinates?,
-        layer: (GraphicsLayerScope.() -> Unit)?
-    ) {
-        drawRect(
-            brush = Brush.linearGradient(
-                colors = listOf(
-                    Color.White.copy(alpha = 0.24f),
-                    Color.White.copy(alpha = 0.08f)
-                )
-            )
+    val glassLayer = LocalPlatformGlassLayer.current
+    if (glassLayer != null) {
+        BlurButton(
+            onClick = onClick,
+            blurGlass = glassLayer,
+            modifier = modifier,
+            surfaceColor = Color.White.copy(alpha = 0.12f),
+            tint = Color.White.copy(alpha = 0.06f),
+            content = content
+        )
+    } else {
+        Button(
+            onClick = onClick,
+            modifier = modifier,
+            content = content
         )
     }
 }
+
+

@@ -25,6 +25,7 @@ import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import com.example.tracker.ui.blurglass.glass.GlassLayer
 import com.example.tracker.ui.blurglass.shadow.InsetShadow
 import com.example.tracker.ui.blurglass.shadow.Shadow
 import com.example.tracker.ui.blurglass.utils.recordLayer
@@ -34,17 +35,29 @@ private val DefaultOnDrawBlurGlass: DrawScope.(DrawScope.() -> Unit) -> Unit = {
 
 
 fun Modifier.drawBlurGlassBase(
-    blurglass: BlurGlass,
+    blurGlass: BlurGlass,
     shape: () -> Shape,
     effects: BlurGlassEffect.() -> Unit,
     layer: (GraphicsLayerScope.() -> Unit)? = null,
+    exportedGlass: GlassLayer? = null,
     onDrawBehind: (DrawScope.() -> Unit)? = null,
     onDrawBlurGlass: DrawScope.(drawBlurGlass: DrawScope.() -> Unit) -> Unit = DefaultOnDrawBlurGlass,
     onDrawSurface: (DrawScope.() -> Unit)? = null,
     onDrawFront: (DrawScope.() -> Unit)? = null
 ): Modifier {
-    val shapeMemoized = MemoizedShape(shape)
-    return this
+    return drawBlurGlass(
+        blurGlass = blurGlass,
+        shape = shape,
+        effects = effects,
+        shadow = null,
+        insetShadow = null,
+        layer = layer,
+        exportedGlass = exportedGlass,
+        onDrawBehind = onDrawBehind,
+        onDrawBlurGlass = onDrawBlurGlass,
+        onDrawSurface = onDrawSurface,
+        onDrawFront = onDrawFront
+    )
 }
 
 fun Modifier.drawBlurGlass(
@@ -54,6 +67,7 @@ fun Modifier.drawBlurGlass(
     shadow: (() -> Shadow?)? = { Shadow.Default },
     insetShadow: (() -> InsetShadow?)? = null,
     layer: (GraphicsLayerScope.() -> Unit)? = null,
+    exportedGlass: GlassLayer? = null,
     onDrawBehind: (DrawScope.() -> Unit)? = null,
     onDrawBlurGlass: DrawScope.(drawBlurGlass: DrawScope.() -> Unit) -> Unit = DefaultOnDrawBlurGlass,
     onDrawSurface: (DrawScope.() -> Unit)? = null,
@@ -74,6 +88,7 @@ fun Modifier.drawBlurGlass(
                 memoizedShape = memoizedShape,
                 effects = effects,
                 layer = layer,
+                exportedGlass = exportedGlass,
                 onDrawBehind = onDrawBehind,
                 onDrawBlurGlass = onDrawBlurGlass,
                 onDrawSurface = onDrawSurface,
@@ -108,6 +123,7 @@ private class DrawBlurGlassElement(
     val memoizedShape: MemoizedShape,
     val effects: BlurGlassEffect.() -> Unit,
     val layer: (GraphicsLayerScope.() -> Unit)?,
+    val exportedGlass: GlassLayer?,
     val onDrawBehind: (DrawScope.() -> Unit)?,
     val onDrawBlurGlass: DrawScope.(drawBlurGlass: DrawScope.() -> Unit) -> Unit,
     val onDrawSurface: (DrawScope.() -> Unit)?,
@@ -120,6 +136,7 @@ private class DrawBlurGlassElement(
             memoizedShape = memoizedShape,
             effects = effects,
             layer = layer,
+            exportedGlass = exportedGlass,
             onDrawBehind = onDrawBehind,
             onDrawBlurGlass = onDrawBlurGlass,
             onDrawSurface = onDrawSurface,
@@ -132,6 +149,7 @@ private class DrawBlurGlassElement(
         node.memoizedShape = memoizedShape
         node.effects = effects
         node.layer = layer
+        node.exportedGlass = exportedGlass
         node.onDrawBehind = onDrawBehind
         node.onDrawBlurGlass = onDrawBlurGlass
         node.onDrawSurface = onDrawSurface
@@ -145,6 +163,7 @@ private class DrawBlurGlassElement(
         properties["memoizedShape"] = memoizedShape
         properties["effects"] = effects
         properties["layer"] = layer
+        properties["exportedGlass"] = exportedGlass
         properties["onDrawBehind"] = onDrawBehind
         properties["onDrawBlurGlass"] = onDrawBlurGlass
         properties["onDrawSurface"] = onDrawSurface
@@ -153,12 +172,13 @@ private class DrawBlurGlassElement(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other !is DrawBlurGlassNode) return false
+        if (other !is DrawBlurGlassElement) return false
 
         return blurGlass == other.blurGlass &&
                 memoizedShape == other.memoizedShape &&
                 effects == other.effects &&
                 layer == other.layer &&
+                exportedGlass == other.exportedGlass &&
                 onDrawBehind == other.onDrawBehind &&
                 onDrawBlurGlass == other.onDrawBlurGlass &&
                 onDrawSurface == other.onDrawSurface &&
@@ -170,6 +190,7 @@ private class DrawBlurGlassElement(
         result = 31 * result + memoizedShape.hashCode()
         result = 31 * result + effects.hashCode()
         result = 31 * result + (layer?.hashCode() ?: 0)
+        result = 31 * result + (exportedGlass?.hashCode() ?: 0)
         result = 31 * result + (onDrawBehind?.hashCode() ?: 0)
         result = 31 * result + onDrawBlurGlass.hashCode()
         result = 31 * result + (onDrawSurface?.hashCode() ?: 0)
@@ -183,6 +204,7 @@ private class DrawBlurGlassNode(
     var memoizedShape: MemoizedShape,
     var effects: BlurGlassEffect.() -> Unit,
     var layer: (GraphicsLayerScope.() -> Unit)?,
+    var exportedGlass: GlassLayer?,
     var onDrawBehind: (DrawScope.() -> Unit)?,
     var onDrawBlurGlass: DrawScope.(drawBlurGlass: DrawScope.() -> Unit) -> Unit,
     var onDrawSurface: (DrawScope.() -> Unit)?,
@@ -264,22 +286,25 @@ private class DrawBlurGlassNode(
         drawContent()
         onDrawFront?.invoke(this)
 
-//        exportedBackdrop?.graphicsLayer?.let { layer ->
-//            recordLayer(layer) {
-//                drawVisualLayers()
-//                onDrawFront?.invoke(this)
-//            }
-//        }
+        exportedGlass?.graphicsLayer?.let { layer ->
+            recordLayer(
+                node = this@DrawBlurGlassNode,
+                layer
+            ) {
+                drawVisualLayers()
+                onDrawFront?.invoke(this)
+            }
+        }
     }
 
     override fun onGloballyPositioned(coordinates: LayoutCoordinates) {
         if (coordinates.isAttached) {
-//            if (blurGlass.isCoordinatesDependent) {
-//                layoutCoordinates = coordinates
-//            } else {
+            if (blurGlass.coordinates) {
+                layoutCoordinates = coordinates
+            } else {
                 if (layoutCoordinates != null) layoutCoordinates = null
-//            }
-//            exportedBackdrop?.layerCoordinates = coordinates
+            }
+            exportedGlass?.layerCoordinates = coordinates
         }
     }
 
@@ -310,7 +335,7 @@ private class DrawBlurGlassNode(
         }
         effectScope.reset()
         layoutCoordinates = null
-        //exportedBackdrop?.layerCoordinates = null
+        exportedGlass?.layerCoordinates = null
     }
 }
 

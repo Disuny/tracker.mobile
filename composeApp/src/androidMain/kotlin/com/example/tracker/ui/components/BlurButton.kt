@@ -10,7 +10,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 
@@ -35,7 +37,18 @@ fun BlurButton(
                 blurGlass = blurGlass,
                 shape = { Capsule() },
                 effects = {
-                    blur(2f.dp.toPx())
+                    blur(10f.dp.toPx())
+                },
+                onDrawSurface = {
+                    if (tint.isSpecified) {
+                        drawRect(tint, blendMode = BlendMode.Hue)
+                        drawRect(tint.copy(alpha = 0.7f))
+                    }
+                    if (surfaceColor.isSpecified) {
+                        drawRect(surfaceColor)
+                    } else {
+                        drawRect(Color.White.copy(alpha = 0.14f))
+                    }
                 }
             )
             .clickable(
