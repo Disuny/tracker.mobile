@@ -19,8 +19,8 @@ actual fun AppButton(
             onClick = onClick,
             blurGlass = glassLayer,
             modifier = modifier,
-            surfaceColor = Color.White.copy(alpha = 0.12f),
-            tint = Color.White.copy(alpha = 0.06f),
+            surfaceColor = Color.White.copy(alpha = 0.05f),
+            tint = Color.White.copy(alpha = 0.05f),
             content = content
         )
     } else {
