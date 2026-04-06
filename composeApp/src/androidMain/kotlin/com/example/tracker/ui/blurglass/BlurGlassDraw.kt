@@ -26,8 +26,12 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import com.example.tracker.ui.blurglass.glass.GlassLayer
+import com.example.tracker.ui.blurglass.highlight.Highlight
+import com.example.tracker.ui.blurglass.highlight.HighlightElement
 import com.example.tracker.ui.blurglass.shadow.InsetShadow
+import com.example.tracker.ui.blurglass.shadow.InsetShadowElement
 import com.example.tracker.ui.blurglass.shadow.Shadow
+import com.example.tracker.ui.blurglass.shadow.ShadowElement
 import com.example.tracker.ui.blurglass.utils.recordLayer
 
 private val isBlurSupported = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
@@ -65,6 +69,7 @@ fun Modifier.drawBlurGlass(
     shape: () -> Shape,
     effects: BlurGlassEffect.() -> Unit,
     shadow: (() -> Shadow?)? = { Shadow.Default },
+    highlight: (() -> Highlight?)? = { Highlight.Default },
     insetShadow: (() -> InsetShadow?)? = null,
     layer: (GraphicsLayerScope.() -> Unit)? = null,
     exportedGlass: GlassLayer? = null,
@@ -83,6 +88,36 @@ fun Modifier.drawBlurGlass(
             }
         )
         .then(
+            if (insetShadow != null) {
+                InsetShadowElement(
+                    memoizedShape = memoizedShape,
+                    shadow = insetShadow
+                )
+            } else {
+                Modifier
+            }
+        )
+        .then(
+            if (shadow != null) {
+                ShadowElement(
+                    memoizedShape = memoizedShape,
+                    shadow = shadow
+                )
+            } else {
+                Modifier
+            }
+        )
+        .then(
+            if (highlight != null) {
+                HighlightElement(
+                    memoizedShape = memoizedShape,
+                    highlight = highlight
+                )
+            } else {
+                Modifier
+            }
+        )
+        .then(
             DrawBlurGlassElement(
                 blurGlass = blurGlass,
                 memoizedShape = memoizedShape,
@@ -95,26 +130,6 @@ fun Modifier.drawBlurGlass(
                 onDrawFront = onDrawFront
             )
         )
-//        .then(
-//            if (insetShadow != null) {
-//                InnerShadowElement(
-//                    shapeMemoized = shapeMemoized,
-//                    shadow = insetShadow
-//                )
-//            } else {
-//                Modifier
-//            }
-//        )
-//        .then(
-//            if (shadow != null) {
-//                ShadowElement(
-//                    shapeMemoized = shapeMemoized,
-//                    shadow = shadow
-//                )
-//            } else {
-//                Modifier
-//            }
-//        )
 
 }
 
