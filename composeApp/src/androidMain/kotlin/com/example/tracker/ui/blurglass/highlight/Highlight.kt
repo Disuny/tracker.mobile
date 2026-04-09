@@ -14,14 +14,13 @@ data class Highlight(
 ) {
 
     companion object {
-
+        @Stable
+        val Base: Highlight = Highlight(style = HighlightStyle.Base)
         @Stable
         val Default: Highlight = Highlight()
 
 //        @Stable
 //        val Ambient: Highlight = Highlight(style = HighlightStyle.Ambient)
 //
-//        @Stable
-//        val Plain: Highlight = Highlight(style = HighlightStyle.Plain)
     }
 }

@@ -26,7 +26,7 @@ private class GlassLayerElement(
     }
 
     override fun InspectorInfo.inspectableProperties() {
-        name = "glassLayer"
+        name = "layerGlass"
         properties["glass"] = glass
     }
 

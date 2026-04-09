@@ -7,15 +7,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.tracker.ui.components.PlatformBottomTabsContent
 import com.example.tracker.ui.glass.PlatformGlassScaffold
+import com.example.tracker.ui.screens.LoginScreen
 
 @Composable
 @Preview
 fun App() {
-    MaterialTheme {
-        PlatformGlassScaffold {
-            PlatformBottomTabsContent(
-                modifier = Modifier.safeContentPadding()
-            )
-        }
-    }
+    LoginScreen()
+//    MaterialTheme {
+//        PlatformGlassScaffold {
+//            PlatformBottomTabsContent(
+//                modifier = Modifier.safeContentPadding()
+//            )
+//        }
+//    }
 }

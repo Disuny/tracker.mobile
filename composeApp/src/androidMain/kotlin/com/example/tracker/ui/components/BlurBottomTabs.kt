@@ -167,7 +167,7 @@ fun BlurBottomTabs(
                     shape = { Capsule() },
                     effects = {
                         vibrancy()
-                        blur(4f.dp.toPx())
+                        blur(8f.dp.toPx())
                     },
                     layer = {
                         val progress = dragDampedAnimation.pressProgress
@@ -203,7 +203,7 @@ fun BlurBottomTabs(
                         shape = { Capsule() },
                         effects = {
                             vibrancy()
-                            blur(4f.dp.toPx())
+                            blur(8f.dp.toPx())
                         },
                         onDrawSurface = { drawRect(containerColor) }
                     )
@@ -230,13 +230,11 @@ fun BlurBottomTabs(
                 .drawBlurGlass(
                     blurGlass = rememberGlassCombined(blurGlass, glassTab),
                     shape = { Capsule() },
-                    effects = {
-                        null
-                    },
                     shadow = {
                         val progress = dragDampedAnimation.pressProgress
                         Shadow(alpha = progress)
                     },
+                    effects = { null },
                     highlight = {
                         val progress = dragDampedAnimation.pressProgress
                         Highlight.Default.copy(alpha = progress)

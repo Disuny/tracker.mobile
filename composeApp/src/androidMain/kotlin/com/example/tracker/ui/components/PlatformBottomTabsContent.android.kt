@@ -28,29 +28,39 @@ import com.example.tracker.ui.glass.LocalPlatformGlassLayer
 actual fun PlatformBottomTabsContent(
     modifier: Modifier
 ) {
-    val isLightTheme = !isSystemInDarkTheme()
-    val contentColor = if (isLightTheme) Color.Black else Color.White
     val glassLayer = LocalPlatformGlassLayer.current
 
     if (glassLayer == null) {
         return
     }
 
+    val isLightTheme = !isSystemInDarkTheme()
+    val contentColor = if (isLightTheme) Color.Black else Color.White
+    val accentColor =
+        if (isLightTheme) Color(0xFF0088FF)
+        else Color(0xFF0091FF)
+    val containerColor =
+        if (isLightTheme) Color(0xFFFAFAFA).copy(0.6f)
+        else Color(0xFF121212).copy(0.4f)
+    val dimColor =
+        if (isLightTheme) Color(0xFF29293A).copy(0.23f)
+        else Color(0xFF121212).copy(0.56f)
+
     Column(
         modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(32.dp, Alignment.Bottom),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        var selectedTabIndexThree by rememberSaveable { mutableIntStateOf(0) }
+        var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
         BlurBottomTabs(
-            selectedTabIndex = { selectedTabIndexThree },
-            onTabSelected = { selectedTabIndexThree = it },
+            selectedTabIndex = { selectedTabIndex },
+            onTabSelected = { selectedTabIndex = it },
             blurGlass = glassLayer,
             tabsCount = 5,
             modifier = Modifier.padding(horizontal = 36.dp)
         ) {
             repeat(5) { index ->
-                BlurButtonTab(onClick = { selectedTabIndexThree = index }) {
+                BlurButtonTab(onClick = { selectedTabIndex = index }) {
                     Box(
                         Modifier
                             .size(16.dp)
